@@ -17,6 +17,25 @@ class Settings(BaseSettings):
         ".webm", ".ogg", ".mpeg", ".aac"
     }
 
+    # OpenAI settings
+    openai_api_key: str = ""
+
+    # Whisper has a 25MB limit per request, so we chunk larger files
+    whisper_chunk_duration_minutes: int = 10
+
+    # Database
+    database_url: str = "sqlite+aiosqlite:///./meeting_notes.db"
+
+    # Email settings (Resend)
+    resend_api_key: str = ""
+    email_from: str = "Meeting Notes <notes@yourdomain.com>"
+
+    # Slack settings
+    slack_webhook_url: str = ""
+
+    # Rate limiting
+    rate_limit_per_minute: int = 10
+
     model_config = SettingsConfigDict(env_file=".env")
 
 

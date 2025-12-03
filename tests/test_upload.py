@@ -43,7 +43,9 @@ def test_upload_rejects_unsupported_format(client, temp_upload_dir):
     )
 
     assert response.status_code == 400
-    assert "not allowed" in response.json()["detail"].lower()
+    data = response.json()
+    msg = data.get("message", data.get("detail", "")).lower()
+    assert "not allowed" in msg
 
 
 def test_upload_rejects_oversized_file(client, temp_upload_dir):
@@ -65,7 +67,9 @@ def test_upload_rejects_oversized_file(client, temp_upload_dir):
         )
 
         assert response.status_code == 400
-        assert "too large" in response.json()["detail"].lower()
+        data = response.json()
+        msg = data.get("message", data.get("detail", "")).lower()
+        assert "too large" in msg
     finally:
         settings.max_file_size_mb = original_limit
 
@@ -109,4 +113,6 @@ def test_get_file_info_not_found(client, temp_upload_dir):
     response = client.get("/api/files/does-not-exist-12345")
 
     assert response.status_code == 404
-    assert "not found" in response.json()["detail"].lower()
+    data = response.json()
+    msg = data.get("message", data.get("detail", "")).lower()
+    assert "not found" in msg

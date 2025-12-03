@@ -2,9 +2,13 @@ import uuid
 from pathlib import Path
 
 import aiofiles
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
+from app.database import get_db
+from app.models import Transcription
+from app.rate_limit import limiter
 
 router = APIRouter(tags=["upload"])
 
@@ -21,13 +25,17 @@ def get_file_extension(filename: str) -> str:
 
 
 @router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+@limiter.limit("5/minute")
+async def upload_file(
+    request: Request,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db)
+):
     """
     Upload an audio or video file for processing.
 
-    The file gets saved to disk with a unique ID so we can
-    process it later. Right now we just store it - transcription
-    comes in a future phase.
+    The file gets saved to disk and a transcription job is created.
+    Use the returned file_id to start transcription and check progress.
     """
     # make sure they gave us a filename
     if not file.filename:
@@ -42,7 +50,6 @@ async def upload_file(file: UploadFile = File(...)):
         )
 
     # read the file to check size
-    # we do this in chunks to avoid loading huge files into memory
     content = await file.read()
     file_size_mb = len(content) / (1024 * 1024)
 
@@ -66,6 +73,16 @@ async def upload_file(file: UploadFile = File(...)):
     # save the file
     async with aiofiles.open(file_path, "wb") as f:
         await f.write(content)
+
+    # create a transcription record in the database
+    transcription = Transcription(
+        file_id=file_id,
+        original_filename=file.filename,
+        file_path=str(file_path),
+        file_size_mb=round(file_size_mb, 2),
+    )
+    db.add(transcription)
+    await db.commit()
 
     return {
         "message": "File uploaded successfully",

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Notes - Upload & Transcribe</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Meeting Notes</h1>
+            <p>Upload a recording and get AI-powered meeting notes</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- upload zone -->
+        <div id="upload-zone" class="upload-zone">
+            <div class="upload-icon">📁</div>
+            <h2>Drop your recording here</h2>
+            <p>or click to browse files</p>
+            <p class="supported-formats">Supports: MP3, MP4, WAV, M4A, WebM, OGG</p>
+            <input type="file" id="file-input" accept=".mp3,.mp4,.wav,.m4a,.webm,.ogg,.mpeg,.aac">
+        </div>
+
+        <!-- processing status -->
+        <div id="status-section" class="hidden">
+            <div class="status-card">
+                <div class="status-header">
+                    <h3 id="file-name">filename.mp3</h3>
+                    <span id="status-badge" class="status-badge pending">Pending</span>
+                </div>
+
+                <!-- steps indicator -->
+                <div class="steps">
+                    <div id="step-upload" class="step">
+                        <div class="step-icon">📤</div>
+                        <span>Upload</span>
+                    </div>
+                    <div id="step-transcribe" class="step">
+                        <div class="step-icon">🎯</div>
+                        <span>Transcribe</span>
+                    </div>
+                    <div id="step-summarize" class="step">
+                        <div class="step-icon">✨</div>
+                        <span>Summarize</span>
+                    </div>
+                </div>
+
+                <!-- progress bar -->
+                <div id="progress-section">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p id="progress-text" class="progress-text">Uploading...</p>
+                </div>
+
+                <!-- error message -->
+                <div id="error-section" class="hidden">
+                    <div class="error-message" id="error-message"></div>
+                </div>
+            </div>
+
+            <!-- action buttons -->
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                <button id="new-upload-btn" class="btn btn-secondary hidden" onclick="resetUpload()">
+                    📁 New Upload
+                </button>
+            </div>
+        </div>
+
+        <!-- results section -->
+        <div id="results-section" class="results hidden">
+            <!-- summary -->
+            <div class="result-section fade-in">
+                <div class="result-header">
+                    <h3>📝 Meeting Summary</h3>
+                    <button class="copy-btn" onclick="copySection('summary-list')">Copy</button>
+                </div>
+                <ul id="summary-list" class="result-list"></ul>
+            </div>
+
+            <!-- action items -->
+            <div class="result-section fade-in">
+                <div class="result-header">
+                    <h3>✅ Action Items</h3>
+                    <button class="copy-btn" onclick="copySection('actions-list')">Copy</button>
+                </div>
+                <ul id="actions-list" class="result-list"></ul>
+            </div>
+
+            <!-- key decisions -->
+            <div class="result-section fade-in">
+                <div class="result-header">
+                    <h3>🎯 Key Decisions</h3>
+                    <button class="copy-btn" onclick="copySection('decisions-list')">Copy</button>
+                </div>
+                <ul id="decisions-list" class="result-list"></ul>
+            </div>
+
+            <!-- follow-up questions -->
+            <div class="result-section fade-in">
+                <div class="result-header">
+                    <h3>❓ Follow-up Questions</h3>
+                    <button class="copy-btn" onclick="copySection('questions-list')">Copy</button>
+                </div>
+                <ul id="questions-list" class="result-list"></ul>
+            </div>
+
+            <!-- full transcript (collapsed) -->
+            <div class="result-section fade-in">
+                <div class="result-header">
+                    <h3>📄 Full Transcript</h3>
+                    <button class="copy-btn" onclick="copySection('transcript-content')">Copy</button>
+                </div>
+                <div id="transcript-content" class="transcript-content"></div>
+            </div>
+
+            <!-- share options -->
+            <div class="result-section fade-in">
+                <div class="result-header">
+                    <h3>📤 Share Notes</h3>
+                </div>
+                <div class="share-options">
+                    <div class="share-row">
+                        <input type="email" id="email-input" placeholder="email@example.com" class="share-input">
+                        <button class="btn btn-primary" onclick="sendEmail()" id="email-btn">
+                            ✉️ Send Email
+                        </button>
+                    </div>
+                    <div class="share-row">
+                        <input type="url" id="slack-input" placeholder="Slack webhook URL (optional)" class="share-input">
+                        <button class="btn btn-secondary" onclick="sendSlack()" id="slack-btn">
+                            💬 Send to Slack
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- copy all button -->
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="copyAll()">
+                    📋 Copy All Notes
+                </button>
+                <button class="btn btn-secondary" onclick="resetUpload()">
+                    📁 New Upload
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
