@@ -1,0 +1,18 @@
+[project]
+name = "meeting-notes-system"
+version = "0.1.0"
+description = "Automated system for transcribing meetings and extracting action items"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
