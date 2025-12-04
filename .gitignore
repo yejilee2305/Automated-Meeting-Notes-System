@@ -208,6 +208,7 @@ __marimo__/
 
 # Project specific
 uploads/
+data/
 *.mp3
 *.mp4
 *.wav
@@ -219,7 +220,11 @@ uploads/
 
 # Local database
 *.db
+*.db-journal
 
 # IDE
 .idea/
 .vscode/
+
+# macOS
+.DS_Store

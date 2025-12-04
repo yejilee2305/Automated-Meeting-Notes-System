@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Persist uploads and database
+      - ./uploads:/app/uploads
+      - ./data:/app/data
+    environment:
+      # Override database path for Docker
+      - DATABASE_URL=sqlite+aiosqlite:///./data/meeting_notes.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: Run with PostgreSQL for production
+  # Uncomment the following to use PostgreSQL instead of SQLite
+
+  # db:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_USER: meeting_notes
+  #     POSTGRES_PASSWORD: your-secure-password
+  #     POSTGRES_DB: meeting_notes
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U meeting_notes"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+# volumes:
+#   postgres_data:
